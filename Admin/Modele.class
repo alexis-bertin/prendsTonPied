@@ -1,0 +1,55 @@
+<?php
+require_once("connexions.php");
+class Modele implements JsonSerializable {
+	private $nomModele;
+	private $nomMarque;
+
+	public function __construct(array $arguments = array()){
+		if(!empty($arguments)){
+			foreach($arguments as $property=>$argument){
+				$this->{$property}=$argument;
+			}
+		}
+	}
+	function __get($nom){
+		return $this->$nom;
+	}
+	function __set($nom, $valeur){
+		$this->$nom=$valeur;
+	}
+	public function __toString(){
+		$name=get_class($this);
+		$s="<{$name}>\n";
+		foreach($this as $key=>$value){
+			$s.="\t<{$key}>{$this->{$key}}</{$key}>\n";
+		}
+		$s.="</{$name}>\n";
+		return $s;
+	}
+	public static function getAllModelesFromMarqueName($nomMarque){
+		PDOConnexion::setParameters("mysql:host=db674212202.db.1and1.com;dbname=db674212202","dbo674212202","Alex040698");
+		$db = PDOConnexion::getInstance();
+		$sql="SELECT modele from Chaussures where nomMarque = :nom";
+		$sth = $db->prepare($sql);
+		$sth->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE,'Chaussures');
+		$sth->execute(array(":nom"=>$nomMarque));
+		return $sth->fetchAll();
+	}
+	public static function getModeleByName($nomModele){
+		PDOConnexion::setParameters("mysql:host=db674212202.db.1and1.com;dbname=db674212202","dbo674212202","Alex040698");
+		$db = PDOConnexion::getInstance();
+		$sql="SELECT modele from Chaussures where nomModele = :nom";
+		$sth = $db->prepare($sql);
+		$sth->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE,'Chaussures');
+		$sth->execute(array(":nom"=>$nomModele));
+		return $sth->fetch();
+	}
+	public function JsonSerialize(){
+		$res=array();
+		foreach($this as $key=>$value){
+			$res[$key]=$value;
+		}
+		return $res;			
+	}
+}
+?>

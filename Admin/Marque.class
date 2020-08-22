@@ -1,0 +1,28 @@
+<?php
+require_once("connexions.php");
+class Marque{
+	private $nomMarque;
+	public function __construct(array $arguments = array()){
+		if(!empty($arguments)){
+			foreach($arguments as $property=>$argument){
+				$this->{$property}=$argument;
+			}
+		}
+	}
+	function __get($nom){
+		return $this->$nom;
+	}
+	function __set($nom, $valeur){
+		$this->$nom=$valeur;
+	}
+	public static function getAllMarques(){
+		PDOConnexion::setParameters("mysql:host=db674212202.db.1and1.com;dbname=db674212202","dbo674212202","Alex040698");
+		$db = PDOConnexion::getInstance();
+		$sql="SELECT DISTINCT marque from Chaussures";
+		$sth = $db->prepare($sql);
+		$sth->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE,'Chaussures');
+		$sth->execute();
+		return $sth->fetchAll();
+	}
+}
+?>
